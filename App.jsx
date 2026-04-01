@@ -1,6 +1,7 @@
 import React from 'react';
 import { Toaster } from 'react-hot-toast';
-import RegistrationForm from './components/RegistrationForm';
+// In App.jsx
+import RegistrationForm from "./src/components/RegistrationForm";
 
 function App() {
   return (
