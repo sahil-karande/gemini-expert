@@ -5,9 +5,7 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-// --- HELPER FUNCTIONS ---
-
-// 1. Fetch participant details (Check if they exist)
+// 1. Fetch participant details
 export const getParticipant = async (email) => {
   const { data, error } = await supabase
     .from('participants')
@@ -24,6 +22,29 @@ export const createParticipant = async (participantData) => {
     .upsert(participantData)
     .select();
   return { data, error };
+};
+
+// --- NEW STORAGE UPLOAD LOGIC ---
+export const uploadImagesToStorage = async (files, email, round) => {
+  const uploadPromises = files.map(async (file, index) => {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${email}_R${round}_${Date.now()}_${index}.${fileExt}`;
+    const filePath = `submissions/${fileName}`;
+
+    const { data, error } = await supabase.storage
+      .from('submission-images') // Ensure this bucket exists in Supabase
+      .upload(filePath, file);
+
+    if (error) throw error;
+
+    const { data: { publicUrl } } = supabase.storage
+      .from('submission-images')
+      .getPublicUrl(filePath);
+
+    return publicUrl;
+  });
+
+  return Promise.all(uploadPromises);
 };
 
 // 3. Upload submission data
