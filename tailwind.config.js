@@ -2,8 +2,10 @@
 export default {
   content: [
     "./index.html",
-    "./App.jsx", // THIS IS CRITICAL: Since App.jsx is in the root
-    "./src/**/*.{js,ts,jsx,tsx}", // THIS SCANS YOUR COMPONENTS
+    "./App.jsx",
+    "./src/**/*.{js,ts,jsx,tsx}",
+    "./src/components/**/*.{js,ts,jsx,tsx}", // Explicitly add this for GitHub
+    "./*.{js,ts,jsx,tsx}" // This scans EVERY file in your root directory
   ],
   theme: {
     extend: {
