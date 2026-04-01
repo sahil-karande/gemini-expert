@@ -7,13 +7,11 @@ import OrganizerLogin from './src/components/OrganizerLogin';
 import { Toaster } from 'react-hot-toast';
 
 function App() {
-  // 1. Initialize state from LocalStorage so it survives a refresh
   const [isAuthorized, setIsAuthorized] = useState(() => {
     const savedAuth = localStorage.getItem('isOrganizerAuthorized');
     return savedAuth === 'true';
   });
 
-  // 2. Function to call when login is successful
   const handleLoginSuccess = () => {
     setIsAuthorized(true);
     localStorage.setItem('isOrganizerAuthorized', 'true');
@@ -23,18 +21,16 @@ function App() {
     <Router>
       <Toaster position="top-right" />
       <Routes>
-        {/* Public Route */}
         <Route path="/" element={<RegistrationForm />} />
 
-        {/* Login Route - Pass the new handler */}
         <Route 
           path="/admin-login" 
           element={<OrganizerLogin onLogin={handleLoginSuccess} />} 
         />
 
-        {/* Protected Route */}
+        {/* Updated Route: Accepts :round as a parameter (e.g., /admin/archive/1) */}
         <Route 
-          path="/admin/archive" 
+          path="/admin/archive/:round" 
           element={
             <ProtectedRoute isAuthorized={isAuthorized}>
               <OrganizerArchive />
@@ -43,7 +39,9 @@ function App() {
         />
 
         {/* Redirects */}
-        <Route path="/organizer" element={<Navigate to="/admin/archive" />} />
+        {/* If user goes to the base archive link, send them to Round 1 by default */}
+        <Route path="/admin/archive" element={<Navigate to="/admin/archive/1" replace />} />
+        <Route path="/organizer" element={<Navigate to="/admin/archive/1" replace />} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </Router>
