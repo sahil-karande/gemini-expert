@@ -3,9 +3,9 @@ export default {
   content: [
     "./index.html",
     "./App.jsx",
+    "./main.jsx",
     "./src/**/*.{js,ts,jsx,tsx}",
-    "./src/components/**/*.{js,ts,jsx,tsx}", // Explicitly add this for GitHub
-    "./*.{js,ts,jsx,tsx}" // This scans EVERY file in your root directory
+    "./src/components/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
     extend: {
