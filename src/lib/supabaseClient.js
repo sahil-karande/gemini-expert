@@ -5,7 +5,7 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-// 1. Fetch participant details
+// 1. Fetch participant
 export const getParticipant = async (email) => {
   const { data, error } = await supabase
     .from('participants')
@@ -15,7 +15,7 @@ export const getParticipant = async (email) => {
   return { data, error };
 };
 
-// 2. Register or update a participant
+// 2. Create participant
 export const createParticipant = async (participantData) => {
   const { data, error } = await supabase
     .from('participants')
@@ -24,30 +24,34 @@ export const createParticipant = async (participantData) => {
   return { data, error };
 };
 
-// --- NEW STORAGE UPLOAD LOGIC ---
-export const uploadImagesToStorage = async (files, email, round) => {
-  const uploadPromises = files.map(async (file, index) => {
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${email}_R${round}_${Date.now()}_${index}.${fileExt}`;
+// 3. Upload images
+export const uploadImagesToStorage = async (files, email, round, onProgress) => {
+  const urls = [];
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
+    const fileName = `${email}_R${round}_${Date.now()}_${i}.${file.name.split('.').pop()}`;
     const filePath = `submissions/${fileName}`;
 
-    const { data, error } = await supabase.storage
-      .from('submission-images') // Ensure this bucket exists in Supabase
+    const { error: uploadError } = await supabase.storage
+      .from('submission-images')
       .upload(filePath, file);
 
-    if (error) throw error;
+    if (uploadError) throw uploadError;
 
     const { data: { publicUrl } } = supabase.storage
       .from('submission-images')
       .getPublicUrl(filePath);
 
-    return publicUrl;
-  });
-
-  return Promise.all(uploadPromises);
+    urls.push(publicUrl);
+    
+    if (onProgress) {
+      onProgress(Math.round(40 + ((i + 1) / files.length) * 50));
+    }
+  }
+  return urls;
 };
 
-// 3. Upload submission data
+// 4. THIS IS THE MISSING PIECE - MUST BE EXPORTED
 export const uploadSubmission = async (submissionData) => {
   const { data, error } = await supabase
     .from('submissions')
