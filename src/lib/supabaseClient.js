@@ -5,7 +5,7 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-// 1. Fetch participant
+// 1. Fetch participant (Used for auto-fill)
 export const getParticipant = async (email) => {
   const { data, error } = await supabase
     .from('participants')
@@ -15,7 +15,7 @@ export const getParticipant = async (email) => {
   return { data, error };
 };
 
-// 2. Create participant
+// 2. Create/Update participant
 export const createParticipant = async (participantData) => {
   const { data, error } = await supabase
     .from('participants')
@@ -24,7 +24,7 @@ export const createParticipant = async (participantData) => {
   return { data, error };
 };
 
-// 3. Upload images
+// 3. Upload images to Storage
 export const uploadImagesToStorage = async (files, email, round, onProgress) => {
   const urls = [];
   for (let i = 0; i < files.length; i++) {
@@ -51,10 +51,29 @@ export const uploadImagesToStorage = async (files, email, round, onProgress) => 
   return urls;
 };
 
-// 4. THIS IS THE MISSING PIECE - MUST BE EXPORTED
+// 4. Save the submission (Crucial for Phase 2)
 export const uploadSubmission = async (submissionData) => {
   const { data, error } = await supabase
     .from('submissions')
     .insert([submissionData]);
+  return { data, error };
+};
+
+// 5. Fetch all submissions (Crucial for Phase 3)
+export const getAllSubmissions = async () => {
+  const { data, error } = await supabase
+    .from('submissions')
+    .select(`
+      *,
+      participants (
+        full_name,
+        college_name,
+        phone_number,
+        department,
+        year_of_study
+      )
+    `)
+    .order('timestamp', { ascending: false });
+    
   return { data, error };
 };
