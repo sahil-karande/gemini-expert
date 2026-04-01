@@ -14,7 +14,7 @@ const RegistrationForm = () => {
   const [isExistingUser, setIsExistingUser] = useState(false);
   const [round, setRound] = useState(1);
   const [uploadProgress, setUploadProgress] = useState(0);
-  const [filesSelected, setFilesSelected] = useState(false); // New state to track readiness
+  const [filesSelected, setFilesSelected] = useState(false); 
   
   const [formData, setFormData] = useState({
     email_id: '',
@@ -28,12 +28,11 @@ const RegistrationForm = () => {
     images: []
   });
 
-  // Validation Logic
-  const isRound2Invalid = round === 2 && (formData.images.length < 2 || formData.images.length > 4);
+  // 1. Updated Validation Logic: Both rounds now require exactly 1 image
+  const isRound2Invalid = round === 2 && formData.images.length !== 1;
   const isRound1Invalid = round === 1 && formData.images.length !== 1;
   const isFormIncomplete = !formData.ai_prompt || !formData.email_id || !formData.full_name || !formData.phone_number || !formData.college_name || !formData.department || !formData.year_of_study;
   
-  // Submit is only clickable if form is complete AND files meet round requirements
   const isDisabled = loading || isRound1Invalid || isRound2Invalid || isFormIncomplete;
 
   const handleEmailBlur = async () => {
@@ -55,21 +54,21 @@ const RegistrationForm = () => {
     } catch (err) { console.error(err); }
   };
 
+  // 2. Updated File Change Logic: Enforce single file selection for all rounds
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
-    if (round === 1 && files.length !== 1) {
-      toast.error("Round 1 requires exactly 1 image.");
+    
+    if (files.length !== 1) {
+      toast.error("Please select exactly 1 image.");
+      e.target.value = ""; 
       setFilesSelected(false);
+      setFormData(prev => ({ ...prev, images: [] }));
       return;
     }
-    if (round === 2 && (files.length < 2 || files.length > 4)) {
-      toast.error("Round 2 requires between 2 and 4 images.");
-      setFilesSelected(false);
-      return;
-    }
+
     setFormData({ ...formData, images: files });
     setFilesSelected(true);
-    toast.success("Images attached successfully!");
+    toast.success("Image attached successfully!");
   };
 
   const handleSubmit = async (e) => {
@@ -78,7 +77,6 @@ const RegistrationForm = () => {
     setUploadProgress(5);
 
     try {
-      // 1. Compression
       const compressedImages = [];
       for (let i = 0; i < formData.images.length; i++) {
         const options = { maxSizeMB: 1, maxWidthOrHeight: 1920, useWebWorker: true };
@@ -87,7 +85,6 @@ const RegistrationForm = () => {
         setUploadProgress(Math.round(5 + ((i + 1) / formData.images.length) * 25));
       }
 
-      // 2. Participant Setup (Save to 'participants' table)
       await createParticipant({
         email_id: formData.email_id,
         full_name: formData.full_name,
@@ -98,7 +95,6 @@ const RegistrationForm = () => {
       });
       setUploadProgress(40);
 
-      // 3. Storage Upload
       const imageUrls = await uploadImagesToStorage(
         compressedImages, 
         formData.email_id, 
@@ -106,7 +102,6 @@ const RegistrationForm = () => {
         (p) => setUploadProgress(p)
       );
 
-      // 4. Final Submission (Save to 'submissions' table)
       await uploadSubmission({
         participant_email: formData.email_id,
         round_number: round,
@@ -135,8 +130,6 @@ const RegistrationForm = () => {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-6 bg-[#121212] text-white">
-      
-      {/* Round Toggle */}
       <div className="flex gap-4 mb-8 bg-[#1e1e1e] p-2 rounded-xl border border-blue-500/20 shadow-xl">
         <button type="button" onClick={() => { setRound(1); setFormData({...formData, images: []}); setFilesSelected(false); }}
           className={`flex items-center gap-2 px-6 py-2 rounded-lg transition-all ${round === 1 ? 'bg-blue-600 text-white shadow-blue-500/40' : 'text-gray-400'}`}>
@@ -154,7 +147,7 @@ const RegistrationForm = () => {
         </h2>
         
         <form onSubmit={handleSubmit} className="space-y-6 mt-8">
-          {/* User Details Grid */}
+          {/* Form Fields ... (Keep these the same) */}
           <div className="space-y-4">
             <div className="relative">
               <Mail className="absolute left-3 top-3 text-blue-400 w-5 h-5" />
@@ -213,26 +206,35 @@ const RegistrationForm = () => {
           <textarea placeholder="Enter your Master AI Prompt..." className="w-full bg-[#121212] border border-gray-700 rounded-lg p-4 h-32 outline-none focus:border-blue-500"
             value={formData.ai_prompt} onChange={(e) => setFormData({...formData, ai_prompt: e.target.value})} required />
 
-          {/* Stable Upload Area */}
+          {/* 3. Updated Upload Area: removed 'multiple' and updated helper text */}
           <div className={`group border-2 border-dashed rounded-lg p-6 text-center transition-all ${filesSelected ? 'border-green-500 bg-green-500/5' : 'border-gray-700 hover:border-blue-500'}`}>
-            <input type="file" multiple={round === 2} accept="image/*" className="hidden" id="image-upload" onChange={handleFileChange} />
+            <input 
+              key={`upload-round-${round}`} 
+              type="file" 
+              multiple={false} // Force single file selection
+              accept="image/*" 
+              className="hidden" 
+              id="image-upload" 
+              onChange={handleFileChange} 
+            />
             <label htmlFor="image-upload" className="cursor-pointer block w-full h-full">
               {filesSelected ? (
                 <div className="flex flex-col items-center text-green-400">
                   <CheckCircle size={32} className="mb-2" />
-                  <p className="font-bold">Files Ready: {formData.images.length}</p>
-                  <p className="text-xs">Click to change selection</p>
+                  <p className="font-bold">Image Ready</p>
+                  <p className="text-xs text-gray-500">Click to change selection</p>
                 </div>
               ) : (
-                <>
-                  <Upload className="mx-auto text-blue-400 mb-2 group-hover:scale-110 transition-transform" />
-                  <p className="text-sm text-gray-400">Upload {round === 1 ? "1 Image" : "2-4 Images"}</p>
-                </>
+                <div className="flex flex-col items-center">
+                  <Upload className={`mx-auto mb-2 group-hover:scale-110 transition-transform ${round === 1 ? 'text-blue-400' : 'text-purple-400'}`} />
+                  <p className="text-sm text-gray-400">
+                    Upload 1 Image
+                  </p>
+                </div>
               )}
             </label>
           </div>
 
-          {/* Progress Bar */}
           {loading && (
             <div className="space-y-2">
               <div className="flex justify-between text-xs font-mono text-blue-400">

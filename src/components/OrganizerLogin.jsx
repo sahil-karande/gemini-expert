@@ -1,27 +1,29 @@
 import React, { useState } from 'react';
 import { Lock, ShieldCheck, AlertCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const OrganizerLogin = ({ onLogin }) => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState(false);
+  const navigate = useNavigate();
   
-  // The master password you defined in your project requirements
   const ADMIN_PASSWORD = "gemini_expert_2024"; 
 
   const handleLogin = (e) => {
     e.preventDefault();
     if (password === ADMIN_PASSWORD) {
-      onLogin();
+      if (typeof onLogin === 'function') {
+        onLogin(); 
+        navigate('/admin/archive');
+      }
     } else {
       setError(true);
-      // Reset error after 3 seconds
       setTimeout(() => setError(false), 3000);
     }
-  };
+  }; // This bracket was likely missing or misplaced
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-[#0a0a0a] p-4">
-      {/* Glow Effect Background */}
       <div className="absolute w-64 h-64 bg-purple-600/10 rounded-full blur-[120px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></div>
 
       <div className="w-full max-w-md relative z-10">
