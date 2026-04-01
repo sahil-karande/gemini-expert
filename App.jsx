@@ -5,7 +5,6 @@ import RegistrationForm from "./src/components/RegistrationForm";
 function App() {
   return (
     <>
-      {/* Required for the "Success" notifications */}
       <Toaster 
         position="top-right"
         toastOptions={{
