@@ -4,6 +4,7 @@ import { toast } from 'react-hot-toast';
 import imageCompression from 'browser-image-compression';
 import { getParticipant, createParticipant, uploadSubmission } from '../lib/supabaseClient';
 
+
 const RegistrationForm = () => {
   const [loading, setLoading] = useState(false);
   const [isExistingUser, setIsExistingUser] = useState(false);

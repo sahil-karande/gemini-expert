@@ -1,12 +1,11 @@
 import React from 'react';
 import { Toaster } from 'react-hot-toast';
-// In App.jsx
 import RegistrationForm from "./src/components/RegistrationForm";
 
 function App() {
   return (
     <>
-      {/* Required for the "Success" popups to work */}
+      {/* Required for the "Success" notifications */}
       <Toaster 
         position="top-right"
         toastOptions={{
