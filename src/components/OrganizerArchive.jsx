@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom'; // Import useParams and Link
 import { Search, School, Box, Phone, MapPin } from 'lucide-react';
-import { getAllSubmissions } from '../lib/supabaseClient';
+import { getAllSubmissions } from '../lib/supabaseApi';
 
 const OrganizerArchive = () => {
   const { round } = useParams(); // Get the current round from the URL (e.g., "1" or "2")

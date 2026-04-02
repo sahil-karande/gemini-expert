@@ -7,7 +7,7 @@ import {
   createParticipant, 
   uploadSubmission, 
   uploadImagesToStorage 
-} from '../lib/supabaseClient';
+} from '../lib/supabaseApi'; // <-- CHANGED THIS LINEnp 
 
 const RegistrationForm = () => {
   const [loading, setLoading] = useState(false);
