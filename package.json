@@ -3,12 +3,14 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
-  },
+ "scripts": {
+  "build-css": "tailwindcss -i ./src/index.css -o ./src/tailwind-build.css",
+  "dev": "npm run build-css && vite",
+  "build": "npm run build-css && vite build",
+  "lint": "eslint .",
+  "preview": "vite preview"
+},
+
   "dependencies": {
     "@supabase/supabase-js": "^2.48.0",
     "browser-image-compression": "^2.0.2",

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import RegistrationForm from './src/components/RegistrationForm';
-import ProtectedRoute from './src/components/ProtectedRoute';
-import OrganizerArchive from './src/components/OrganizerArchive';
-import OrganizerLogin from './src/components/OrganizerLogin';
+import RegistrationForm from "./components/RegistrationForm";
+import ProtectedRoute from "./components/ProtectedRoute";
+import OrganizerArchive from "./components/OrganizerArchive";
+import OrganizerLogin from "./components/OrganizerLogin";
 import { Toaster } from 'react-hot-toast';
 
 function App() {
