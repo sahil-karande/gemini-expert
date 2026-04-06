@@ -81,7 +81,8 @@ export const getAllSubmissions = async () => {
 
 // ... existing code ...
 
-// 6. Update submission round (Move from R1 to R2)
+// src/lib/supabaseApi.js
+// Ensure this is at the top level, NOT inside another function
 export const updateSubmissionRound = async (submissionId, newRound) => {
   const { data, error } = await supabase
     .from('submissions')
