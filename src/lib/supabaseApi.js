@@ -77,3 +77,16 @@ export const getAllSubmissions = async () => {
     
   return { data, error };
 };
+// src/lib/supabaseApi.js
+
+// ... existing code ...
+
+// 6. Update submission round (Move from R1 to R2)
+export const updateSubmissionRound = async (submissionId, newRound) => {
+  const { data, error } = await supabase
+    .from('submissions')
+    .update({ round_number: newRound })
+    .eq('id', submissionId)
+    .select();
+  return { data, error };
+};
