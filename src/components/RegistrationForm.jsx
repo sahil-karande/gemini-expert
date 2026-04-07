@@ -199,6 +199,7 @@ const RegistrationForm = () => {
                 <option value="Dream Startup Office">Dream Startup Office</option>
                 <option value="A World Without Pollution">A World Without Pollution</option>
                 <option value="Human + Machine Collaboration">Human + Machine Collaboration</option>
+                <option value="Harmony in Family">Human in Family</option>
               </select>
             </div>
           </div>
